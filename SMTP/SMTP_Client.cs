@@ -15,19 +15,19 @@ namespace SMTP_Client
             var port = int.Parse("465"); //port 465
             var server_name = new IPEndPoint(Dns.GetHostEntry(server).AddressList[0], port);
 
-            using (var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) //using вызовет Close в конце
+            using (var client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) //using РІС‹Р·РѕРІРµС‚ Close РІ РєРѕРЅС†Рµ
             {
                 await client.ConnectAsync(server_name);
                 var socketStream = new NetworkStream(client);
-                SslStream ssl_stream = new(socketStream); //SSL поддержка
+                SslStream ssl_stream = new(socketStream); //SSL РїРѕРґРґРµСЂР¶РєР°
                 await ssl_stream.AuthenticateAsClientAsync(server);
 
                 while (true)
                 {
                     Console.Write(">> ");
-                    var message = Console.ReadLine() + "\r\n"; //надо по протоколу добавлять \r\n
+                    var message = Console.ReadLine() + "\r\n"; //РЅР°РґРѕ РїРѕ РїСЂРѕС‚РѕРєРѕР»Сѓ РґРѕР±Р°РІР»СЏС‚СЊ \r\n
                     var result = await SendCommand(ssl_stream, message);
-                    if (result.StartsWith("500 ")) result = await SendCommand(ssl_stream, message); //странно
+                    if (result.StartsWith("500 ")) result = await SendCommand(ssl_stream, message); //СЃС‚СЂР°РЅРЅРѕ
 
                     Console.WriteLine($"[Recvd]: {result}");
                     if (result.StartsWith("221 ")) break;
@@ -36,7 +36,7 @@ namespace SMTP_Client
             }
         }
 
-        //Дальше собирать сообщение по протоколу
+        //Р”Р°Р»СЊС€Рµ СЃРѕР±РёСЂР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёРµ РїРѕ РїСЂРѕС‚РѕРєРѕР»Сѓ
 
         static async Task<string> SendCommand(SslStream sslSteam, string command)
         {
@@ -48,5 +48,4 @@ namespace SMTP_Client
             return Encoding.UTF8.GetString(buffer, 0, bytes);
         }
     }
-}
 }
