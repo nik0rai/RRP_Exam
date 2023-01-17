@@ -49,4 +49,3 @@ namespace SMTP_Client
         }
     }
 }
-}
