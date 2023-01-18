@@ -17,7 +17,7 @@ namespace TCP_server
 
 
             //переменная 
-            int DATA = 0;
+            int DATA = 0; //
             //server
             var port = 1000;
             var host = Dns.GetHostEntry("localhost");
