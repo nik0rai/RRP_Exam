@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace TCP_client
+namespace UDP_client
 {
     public static class Udp_client
     {
@@ -13,8 +13,8 @@ namespace TCP_client
         {
             var port = 1000;
             var host = Dns.GetHostEntry("localhost");
-            var ipAddr = host.AddressList[0];
-            var remoteEndPoint = new IPEndPoint(ipAddr, port);
+            var ipAddr = host.AddressList[0]; 
+            var remoteEndPoint = new IPEndPoint(ipAddr, port); //ip адрес сервера
 
             //переменные
             int data = 5;
@@ -35,7 +35,7 @@ namespace TCP_client
 
         public static byte[] ToBytes(params object[] input)
         {
-            List<int> individual_size = new();
+            List<int> individual_size = new(); // у каждого параметра есть индивидуальный размер - int 4, char 1
 
             int max_size = 0; //у нас может быть несколько параметров разных типов
             for (int i = 0; i < input.Length; i++)
@@ -45,19 +45,19 @@ namespace TCP_client
                 max_size += jumper;
             }
 
-            var result = new byte[max_size+1];
+            var result = new byte[max_size];
 
-            GCHandle gcHandle = new();
+            GCHandle gcHandle = new(); // предоставляет способ доступа к управляемому объеккту из неуправляемой памяти
             int index = 0;
             for (int i = 0; i < input.Length; i++)
             {
                 if (input[i].GetType() == typeof(char)) input[i] = Convert.ToUInt16(input[i]); //ASCII support
 
-                gcHandle = GCHandle.Alloc(input[i], GCHandleType.Pinned);
-                Marshal.Copy(gcHandle.AddrOfPinnedObject(), result, index, individual_size[i]);
-                index += Marshal.SizeOf(individual_size[i]); //новый элемент будет находится с новго индекса
+                gcHandle = GCHandle.Alloc(input[i], GCHandleType.Pinned); // работаем с адресом закрепелнного объекта, таким образом запрещаем сборщику мусора перемещать объект
+                Marshal.Copy(gcHandle.AddrOfPinnedObject(), result, index, individual_size[i]); // аналог ToByte
+                index += individual_size[i]; //новый элемент будет находится с новго индекса
             }
-            gcHandle.Free();
+            gcHandle.Free();// освобождаем дескриптор
             return result;
         }
     }
